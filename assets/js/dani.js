@@ -22,8 +22,7 @@
   var text = document.getElementById('daniText');
   var html = document.documentElement;
 
-  var reduce = function () { return html.classList.contains('reduce-motion'); };
-  var isTouch = html.classList.contains('touch');
+  var reduce = function () { return html.classList.contains('reduce-motion'); };  var isTouch = html.classList.contains('touch');
 
   var state = { x: 18, scene: null, talkTimer: 0, walkTimer: 0, lastSaid: '', idleTimer: 0, tipIndex: 0 };
 
@@ -105,8 +104,7 @@
     var k = Math.min(1, d / 220) * 2.6;
     var flip = root.classList.contains('is-flipped') ? -1 : 1;
     svg.style.setProperty('--px', ((dx / d) * k * flip).toFixed(2));
-    svg.style.setProperty('--py', ((dy / d) * k).toFixed(2));
-  }
+    svg.style.setProperty('--py', ((dy / d) * k).toFixed(2));  }
   function blink() {
     root.classList.add('is-blinking');
     setTimeout(function () { root.classList.remove('is-blinking'); }, 200);

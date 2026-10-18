@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Dani preview</title>
+<link rel="stylesheet" href="../assets/css/main.css">
+<style>
+  body { background: #2a0606; padding: 20px; overflow: auto; }
+  .row { display: flex; flex-wrap: wrap; gap: 24px; }
+  .cell { text-align: center; color: #ffc914; font-family: sans-serif; font-size: 12px; }
+  .cell .dani { position: static; transform: none; width: 150px; transition: none; }
+</style></head>
+<body>
+<!-- Dev-only preview of Dani's moods and poses: open via the local server at /tools/dani-preview.html -->
+<div class="row" id="row"></div>
+<script>
+  fetch('../index.html').then(r => r.text()).then(html => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const svg = doc.querySelector('#daniSvg').outerHTML.replace(/id="daniSvg"/, '').replace(/href="assets\//g, 'href="../assets/');
+    const combos = [['happy','idle'],['happy','wave'],['excited','point'],['scared','idle'],['thinking','idle'],['sad','idle'],['shush','shush']];
+    const cell = (m, p, cls, label) =>
+      `<div class="cell"><div class="dani ${cls}" data-mood="${m}" data-pose="${p}"><div class="dani__btn">${svg}</div></div>${label} ${m} / ${p}</div>`;
+    document.getElementById('row').innerHTML = combos.map(([m, p]) => cell(m, p, '', '')).join('');
+  });
+</script>
+</body></html>

@@ -143,7 +143,8 @@ Images are WebP. To swap one, keep the file name, or update the `src`, `width` a
 
 ### 5.5 Dani's artwork
 Dani is inline SVG inside `<div class="dani">` in `index.html`, viewBox `0 0 100 150`, feet at the bottom.
-- **Recolour:** change `.c-skin`, `.c-hair`, `.c-shirt` and the other `.c-*` fills in `main.css` (DANI section) to resemble the real Dani.
+- **Recolour:** change `.c-skin`, `.c-hair`, `.c-shirt` and the other `.c-*` fills in `main.css` (DANI section).
+- **Preview every mood and pose:** run the local server and open `/tools/dani-preview.html`.
 - **Redraw:** replace the shapes but **keep these group classes** so the animation keeps working: `d-legL`, `d-legR`, `d-torso`, `d-armL`, `d-armR`, `d-brush`, `d-head`, `d-brows` (`d-browL`/`d-browR`), `d-pupils`, `d-lid`, `d-m--{mood}` (one mouth per mood) and `d-finger`. Pivot points are set in CSS (`transform-origin`).
 - **Illustrator artwork:** export it as SVG, then paste the paths into the matching groups.
 

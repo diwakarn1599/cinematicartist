@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ARTIST — A Tamil psychological thriller · A film by Dani</title>
+  <meta name="description" content="ARTIST (ART!ST) — an independent Tamil psychological mystery thriller inspired by true events. A protagonist gone missing. Everyone thinks he's been kidnapped. The truth is shocking.">
+  <meta name="theme-color" content="#070000">
+  <meta property="og:title" content="ARTIST — A film by Dani">
+  <meta property="og:description" content="A protagonist gone missing. Everyone thinks he's been kidnapped. The truth is shocking. An independent Tamil psychological thriller.">
+  <meta property="og:type" content="video.movie">
+  <meta property="og:image" content="assets/img/posters/poster-2.webp">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%237a0504'/%3E%3Crect x='13' y='5' width='6' height='15' fill='%23ffc914'/%3E%3Crect x='13' y='23' width='6' height='5' fill='%23ffc914'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@500;700&family=Oswald:wght@300;400;600&display=swap">
+  <link rel="preload" as="image" href="assets/img/logo-artist.webp">
+  <link rel="stylesheet" href="assets/css/main.css">
+
+  <script>
+    // Runs before paint: feature flags that CSS depends on.
+    (function (d) {
+      var h = d.documentElement;
+      h.classList.remove('no-js'); h.classList.add('js');
+      var store = null; try { store = window.localStorage; } catch (e) {}
+      var get = function (k) { try { return store && store.getItem(k); } catch (e) { return null; } };
+      var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var pref = get('artist:motion');
+      if (pref === 'off' || (pref !== 'on' && rm)) h.classList.add('reduce-motion');
+      if (get('artist:guide') === 'off') h.classList.add('guide-off');
+      h.classList.add('curtain-on'); // the theatre curtain starts closed on every visit
+      var lite = (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2);
+      if (lite) h.classList.add('lite');
+      if (window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches) h.classList.add('touch');
+    })(document);
+  </script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/dani.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Shared SVG filters (grunge type erosion, rough frame edge). -->
+  <svg class="defs" aria-hidden="true" focusable="false" width="0" height="0">
+    <defs>
+      <filter id="grunge" x="-5%" y="-10%" width="110%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.7 1.95" result="holes"/>
+        <feComposite in="SourceGraphic" in2="holes" operator="in"/>
+      </filter>
+      <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035 0.06" numOctaves="4" seed="3" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="46" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="rough-sm" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05 0.08" numOctaves="3" seed="9" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- ============ Theatre curtain: closed on every visit; scroll, swipe or press the button to open ============ -->
+  <div class="theatre" id="theatre" role="region" aria-label="Theatre curtain">
+    <div class="theatre__light" aria-hidden="true"></div>
+    <div class="theatre__panel theatre__panel--l" aria-hidden="true"></div>
+    <div class="theatre__panel theatre__panel--r" aria-hidden="true"></div>
+    <div class="theatre__valance" aria-hidden="true"></div>
+    <div class="theatre__floor" aria-hidden="true"></div>
+    <div class="theatre__ui">
+      <!-- <img class="theatre__logo" src="assets/img/logo-artist.webp" alt="ARTIST" width="1400" height="264"> -->
+      <!-- <p class="theatre__hint" id="theatreHint">Scroll to open the curtain</p> -->
+      <button type="button" class="btn btn--gold theatre__btn" id="theatreOpen">Open the curtain</button>
+      <span class="theatre__arrow" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <!-- ============ The deck's blood-red brushed frame (fixed, decorative) ============ -->
+  <div class="frame" aria-hidden="true">
+    <svg class="frame__svg" id="frameSvg" width="100%" height="100%" preserveAspectRatio="none">
+      <defs>
+        <mask id="frameMask" maskUnits="userSpaceOnUse">
+          <rect width="100%" height="100%" fill="#fff"/>
+          <rect class="frame__window" id="frameWindow" x="3%" y="5%" width="94%" height="88%" fill="#000" filter="url(#rough)"/>
+        </mask>
+      </defs>
+      <g mask="url(#frameMask)">
+        <rect width="100%" height="100%" class="frame__red"/>
+        <g id="frameVeins" class="frame__veins"></g>
+      </g>
+    </svg>
+    <svg class="frame__trees" id="frameTrees" preserveAspectRatio="xMidYMax slice"></svg>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ============ Top bar ============ -->
+  <header class="topbar">
+    <a class="topbar__logo" href="#opening" aria-label="ARTIST — back to the opening"><img src="assets/img/logo-artist.webp" alt="" width="1400" height="264"></a>
+    <nav class="topbar__nav" aria-label="Site">
+      <button type="button" class="tb-btn" id="openChapters" aria-haspopup="dialog" aria-controls="chapters">Chapters</button>
+      <!-- <button type="button" class="tb-btn" data-open-deck="1" aria-haspopup="dialog">Original deck</button> -->
+      <button type="button" class="tb-btn tb-btn--toggle" id="toggleGuide" aria-pressed="true" title="Show or hide Dani, the guide">Guide</button>
+      <button type="button" class="tb-btn tb-btn--toggle" id="toggleMotion" aria-pressed="true" title="Turn animation on or off">Motion</button>
+    </nav>
+  </header>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <!-- Chapter index -->
+  <dialog class="chapters" id="chapters" aria-labelledby="chaptersTitle">
+    <div class="chapters__inner">
+      <h2 id="chaptersTitle" class="h-grunge">Chapters</h2>
+      <ol class="chapters__list" id="chaptersList"></ol>
+      <button type="button" class="dialog-close" data-close aria-label="Close chapters">&times;</button>
+    </div>
+  </dialog>
+
+  <main id="main">
+
+    <!-- ============ 1. OPENING  (P1) ============ -->
+    <section class="scene scene--opening" id="opening" data-chapter="Opening"
+      data-dani-x="18" data-dani-mood="happy" data-dani-pose="wave"
+      data-dani-line="Psst&hellip; I'm Dani. I wrote and directed this one. Scroll &mdash; I'll walk you through it.">
+      <canvas class="embers" id="embers" aria-hidden="true"></canvas>
+      <div class="opening__glow" aria-hidden="true"></div>
+      <div class="opening__inner">
+        <!-- after the curtain opens these play in order: data-beat 1 → 2 → 3 → 4 (timings in main.css) -->
+        <p class="opening__kicker" data-beat="1">The Noche Visuals Production</p>
+        <h1 class="opening__title">
+          <span class="sr-only">ARTIST</span>
+          <img class="opening__logo" src="assets/img/logo-artist.webp" alt="" width="1400" height="264" fetchpriority="high">
+        </h1>
+        <!-- <p class="opening__deck" data-reveal="fade">Pitch deck</p> -->
+        <p class="opening__lang" data-beat="2b">&ndash; Tamil film &ndash;</p>
+        <p class="opening__paren" data-reveal="fade"></p>
+        <p class="opening__credit" data-beat="3">A film by <strong>Dani</strong></p>
+        <p class="opening__credit" data-beat="3b">An independent feature film</p>
+        <a class="scroll-cue" href="#introduction" data-beat="4"><span>Scroll</span><i aria-hidden="true"></i></a>
+      </div>
+    </section>
+
+    <!-- ============ 2. INTRODUCTION  (P2) ============ -->
+    <section class="scene scene--intro" id="introduction" data-chapter="Introduction"
+      data-dani-x="80" data-dani-mood="happy" data-dani-pose="point"
+      data-dani-line="A team of debutants. A limited budget. A lot of heart.">
+      <div class="wrap wrap--narrow">
+        <h2 class="h-section h-grunge" data-reveal="wipe">Introduction</h2>
+        <p class="lead caps" data-reveal="words">
+          Introducing my debut feature film, an independent project created by a talented team of <em>debutants</em>.
+          Our passion for filmmaking led us to create something new and unique, despite working with a limited budget.
+          Our suspense thriller promises to attract audiences with its <em>gripping and unique storyline</em>, leaving the audience on the edge of their seats until the very end.
+          We poured our hearts and souls into this project, and we're confident that it'll be a massive success.
+        </p>
+        <p class="lead caps intrigue" data-reveal="up">
+          <em>And here's the most intriguing part: the film is inspired by true events.</em>
+          What makes it <em>even more exciting</em> is that
+        </p>
+        <blockquote class="pull" data-reveal="up">
+          <p>&ldquo;Most of the audience will be familiar with the true incident, but they won't realize it until the very end.&rdquo;</p>
+        </blockquote>
+        <p class="lead caps" data-reveal="up">The true inspiration is finally revealed in the end. We would be honoured if you'd take a look at our film.</p>
+      </div>
+    </section>
+
+    <!-- ============ 3. LOG LINE  (P3) — the Missing flyer tears to reveal the truth ============ -->
+    <section class="scene scene--logline" id="logline" data-chapter="Log line" data-progress
+      data-dani-x="14" data-dani-mood="thinking" data-dani-pose="idle"
+      data-dani-line="Everyone thinks he's the victim. Keep scrolling&hellip;"
+      data-dani-line2="Told you. Not what it looks like.">
+      <div class="logline__sticky">
+        <h2 class="h-section h-grunge logline__label">Log line</h2>
+        <div class="logline__stage">
+          <!-- The truth, behind the flyer -->
+          <div class="truthcard">
+            <p class="truthcard__text caps">
+              But the truth is shocking &mdash; <em>he isn't kidnapped by someone, he has kidnapped a couple</em> and is torturing them.
+              As the story unfolds we see everything dark and cruel. At the end a surprising <em>twist</em> changes everything,
+              turning the story into a <em>powerful, inspirational and emotional</em> lesson about life.
+            </p>
+          </div>
+          <!-- The flyer (two torn halves of the same artwork) -->
+          <div class="flyer flyer--l">
+            <div class="flyer__paper">
+              <p class="flyer__head">Missing</p>
+              <img class="flyer__photo" src="assets/img/stills/still-nature-2.webp" alt="A man in a patterned shirt stands with his back to the camera, facing the sea." width="1024" height="542" loading="lazy" decoding="async">
+              <p class="flyer__text">A protagonist gone missing. Everyone thinks that he's been <strong>kidnapped</strong> by someone.</p>
+              <p class="flyer__foot">Have you seen him?</p>
+            </div>
+          </div>
+          <div class="flyer flyer--r" aria-hidden="true">
+            <div class="flyer__paper">
+              <p class="flyer__head">Missing</p>
+              <img class="flyer__photo" src="assets/img/stills/still-nature-2.webp" alt="" width="1024" height="542" loading="lazy" decoding="async">
+              <p class="flyer__text">A protagonist gone missing. Everyone thinks that he's been <strong>kidnapped</strong> by someone.</p>
+              <p class="flyer__foot">Have you seen him?</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. STORY  (P4) — 40 Lent days ============ -->
+    <section class="scene scene--story" id="story" data-chapter="The story" data-progress
+      data-dani-x="76" data-dani-mood="scared" data-dani-pose="idle"
+      data-dani-line="40 Lent days. Count them with me&hellip;">
+      <div class="wrap story">
+        <div class="story__text">
+          <h2 class="h-section h-grunge" data-reveal="wipe">Story</h2>
+          <p class="lead caps" data-reveal="up">The feature film, titled <em>&ldquo;ARTIST&rdquo;</em> is a <em>psychological thriller</em> that explores the life of a struggling artist who wants to prove his worth to the world.</p>
+          <p class="body" data-reveal="up">The story begins with the protagonist, an artist, being kidnapped. His family desperately tries to find him. However, the plot takes a twisted turn when it's revealed that he has actually kidnapped a couple and is holding them hostage inside a house for <em class="hl">40 Lent days</em>.</p>
+          <p class="body" data-reveal="up">He takes an oath not to kill them with his own hands, meaning <em class="hl">he shouldn't be the direct cause of their death</em>.</p>
+          <p class="body" data-reveal="up">As the story unfolds, the film reveals why he has done such a thing, and whether the couple dies as he intended. The real motive behind his actions is something he is deeply in need of. A personal mission that drives his madness.</p>
+          <p class="body" data-reveal="up">Over time, the protagonist begins to lose his ability to distinguish between <em class="hl">reality and his imaginary world</em>, ultimately leading to his tragic death. In the end, he succeeds in proving to himself and to others that he is capable of achieving anything he sets his mind to, but at a devastating cost.</p>
+        </div>
+        <div class="story__side">
+          <figure class="story__horse" data-parallax="-0.12">
+            <img src="assets/img/atmos/horse.webp" alt="A horse, lit in deep red, in a dark forest." width="853" height="1213" loading="lazy" decoding="async">
+          </figure>
+          <div class="tally" aria-hidden="true">
+            <p class="tally__count"><span id="tallyNum">0</span><small>/40</small></p>
+            <p class="tally__label">Lent days</p>
+            <svg class="tally__marks" id="tallyMarks" viewBox="0 0 320 120"></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 5. GENRE & TONE  (P5, P6) — red vs white ============ -->
+    <section class="scene scene--tone" id="genre-tone" data-chapter="Genre &amp; tone"
+      data-dani-x="22" data-dani-mood="thinking" data-dani-pose="point"
+      data-dani-line="Red&hellip; or white? Drag the line.">
+      <div class="wrap">
+        <div class="genre">
+          <figure class="genre__img" data-reveal="fade">
+            <img src="assets/img/atmos/chair.webp" alt="An empty chair in a dark, red-lit room." width="997" height="511" loading="lazy" decoding="async">
+          </figure>
+          <div class="genre__text">
+            <h2 class="h-section h-grunge" data-reveal="wipe">Genre</h2>
+            <p class="lead caps" data-reveal="up">The genre of this film could be considered <em>&ldquo;a psychological mystery thriller&rdquo;</em> or a drama with elements of suspense.</p>
+          </div>
+        </div>
+
+        <div class="tone">
+          <div class="tone__text">
+            <h2 class="h-section h-grunge" data-reveal="wipe">Tone</h2>
+            <p class="lead caps" data-reveal="up">The overall tone of the film is <em>dark, intense, and psychological.</em></p>
+            <p class="lead caps" data-reveal="up">The use of <em class="red-word">red</em> and <em class="white-word">white</em> in major spots has potentially indicated a contrast between innocence and danger, or passion and violence.</p>
+          </div>
+          <div class="split" id="split" style="--split:50%">
+            <img class="split__img split__img--red" src="assets/img/stills/still-red-2.webp" alt="Red room: a man confronts a captive in a room covered in black spray-painted scribbles." width="1021" height="544" loading="lazy" decoding="async">
+            <img class="split__img split__img--white" src="assets/img/stills/still-white-2.webp" alt="White room: a man in a patterned shirt points away while a woman in white sits against the wall." width="1021" height="545" loading="lazy" decoding="async">
+            <span class="split__tag split__tag--red" aria-hidden="true">Red</span>
+            <span class="split__tag split__tag--white" aria-hidden="true">White</span>
+            <span class="split__handle" aria-hidden="true"><i></i></span>
+            <label class="sr-only" for="splitRange">Compare the red room and the white room</label>
+            <input class="split__range" id="splitRange" type="range" min="0" max="100" value="50">
+          </div>
+          <figure class="tone__boat" aria-hidden="true"><img src="assets/img/atmos/boat.webp" alt="" width="979" height="385" loading="lazy" decoding="async"></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 6. STRUCTURE  (P7, P8) — a white scene ============ -->
+    <section class="scene scene--structure is-light" id="structure" data-chapter="Structure" data-progress
+      data-dani-x="50" data-dani-mood="happy" data-dani-pose="point"
+      data-dani-line="Three acts. One intermission. No spoilers&hellip; yet.">
+      <div class="wrap">
+        <h2 class="structure__title" data-reveal="fade"><span>Structure of Artist</span></h2>
+        <ol class="timeline" aria-label="Story structure timeline">
+          <li class="timeline__node" data-step="0"><span class="timeline__top">Introduction</span></li>
+          <li class="timeline__node timeline__node--act" data-step="1"><span class="timeline__bottom">Act 1<br>(Set up)</span></li>
+          <li class="timeline__node" data-step="2"><span class="timeline__top">Mid point<br>Intermission</span><span class="timeline__bottom">Act 2<br>(Confrontation)</span></li>
+          <li class="timeline__node timeline__node--act" data-step="3"><span class="timeline__bottom">Act 3<br>(Resolution)</span></li>
+          <li class="timeline__node" data-step="4"><span class="timeline__top">Climax</span></li>
+        </ol>
+        <div class="timeline__line" aria-hidden="true"><span></span></div>
+
+        <div class="acts">
+          <article class="act" data-reveal="up">
+            <h3><span class="act__num">Act I</span> Set up</h3>
+            <p class="act__summary">Establish the kidnapping plotline and the search for the protagonist.</p>
+            <p>The first act of the film is the setup phase. We are introduced to the protagonist, a budding artist who is struggling to find his place in the world. We also get to know that he has been kidnapped by someone, and his sister is desperately searching for him. This initial setup creates a sense of tension and mystery that hooks the audience and keeps them engaged.</p>
+          </article>
+          <article class="act" data-reveal="up">
+            <h3><span class="act__num">Act II</span> Confrontation</h3>
+            <p class="act__summary">Major plot twist reveals the true nature of the protagonist's situation.</p>
+            <p>The second act is the confrontation phase. Here, the audience is given a major plot twist when we learn that the protagonist has actually kidnapped a couple, not the other way around. This twist takes the story in a new direction and creates a sense of unpredictability. The protagonist's hostages are kept in two different rooms, and we see how he interacts with them and how he's able to keep them captive for so long. This act also introduces the concept of method acting and the protagonist's obsession with it.</p>
+          </article>
+          <article class="act" data-reveal="up">
+            <h3><span class="act__num">Act III</span> Resolution</h3>
+            <p class="act__summary">Revelation of the truth behind the protagonist's actions.</p>
+            <p>The final act is the resolution phase. We learn the truth behind the protagonist's actions, as he reveals everything to a psychiatrist. The audience sees the protagonist's descent into madness and his eventual suicide. However, he is able to achieve his goal of proving that he can do anything he sets his mind to, even if it leads to his own destruction. The film ends on a bittersweet note, leaving the audience with a sense of contemplation and reflection.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 7. THE WORLD  (P9) — colour enters through the artist ============ -->
+    <section class="scene scene--world" id="world" data-chapter="The world"
+      data-dani-x="84" data-dani-mood="excited" data-dani-pose="point"
+      data-dani-line="Move your cursor over the picture &mdash; this is how an artist sees."
+      data-dani-line-touch="Drag your finger over the picture &mdash; this is how an artist sees.">
+      <div class="wrap world">
+        <div class="world__text">
+          <h2 class="h-section h-grunge" data-reveal="wipe">The world</h2>
+          <p class="lead caps" data-reveal="up">In this world, the artist's perspective is <em>unique and colourful</em>, and they see the world in ways that most people can't even imagine, and it is shaped by their creativity and imagination. It reflects the beauty and complexity of the human experience.</p>
+          <p class="body" data-reveal="up">Through my film, I invite the audience to explore this <em class="hl">world of the artist</em> and to experience the unique perspective that only an artist can bring. Whether it is the way they see colour, light, and shadow, or the way they interpret emotions and human behaviour, the world of the artist is a rich and diverse landscape that is sure to impress and inspire.</p>
+          <p class="body" data-reveal="up">As a filmmaker, I have carefully crafted this world to be both accessible and engaging, drawing on my own experiences as an artist to create a world that is both authentic and imaginative. I am confident that this world of the artist will captivate audiences and leave a lasting impression.</p>
+        </div>
+        <div class="lens" id="lens" tabindex="0" role="img" aria-label="Film still: a man in a colourful patterned shirt, on the phone, leans against a swirling Starry Night-style mural. A colour lens follows your pointer over a red-tinted version of the image.">
+          <img class="lens__base" src="assets/img/stills/still-search-4.webp" alt="" width="1019" height="536" loading="lazy" decoding="async">
+          <img class="lens__colour" src="assets/img/stills/still-search-4.webp" alt="" width="1019" height="536" loading="lazy" decoding="async">
+          <div class="lens__thumbs" role="group" aria-label="Choose a still">
+            <button type="button" class="is-on" data-lens="assets/img/stills/still-search-4.webp" aria-label="Mural">1</button>
+            <button type="button" data-lens="assets/img/stills/still-nature-4.webp" aria-label="Lake">2</button>
+            <button type="button" data-lens="assets/img/stills/still-nature-3.webp" aria-label="Forest from above">3</button>
+            <button type="button" data-lens="assets/img/stills/still-dark-4.webp" aria-label="Underwater">4</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 8. THE PEOPLE IN THE STORY  (from P4, P8, P20) ============ -->
+    <section class="scene scene--characters" id="characters" data-chapter="Characters"
+      data-dani-x="20" data-dani-mood="thinking" data-dani-pose="idle"
+      data-dani-line="Who's who in the story.">
+      <div class="wrap">
+        <h2 class="h-section h-grunge" data-reveal="wipe">The people in the story</h2>
+        <p class="sub caps" data-reveal="up">The film explores the bond between <em>brother and sister</em>, <em>husband and wife</em>, and <em>friends</em>.</p>
+        <ul class="people">
+          <li class="person" data-reveal="up">
+            <svg class="person__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 54 L40 14 l8 6 -30 40z"/><path d="M40 14 l6 -6 8 6 -6 6"/><circle cx="14" cy="54" r="4"/></svg>
+            <h3>The protagonist</h3>
+            <p>An artist. A budding artist struggling to find his place in the world, who wants to prove his worth to the world. He has a disorder that makes him different from the rest, and an obsession with method acting.</p>
+          </li>
+          <li class="person" data-reveal="up">
+            <svg class="person__glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="26" cy="26" r="14"/><path d="M36 36 L54 54"/></svg>
+            <h3>His sister</h3>
+            <p>Believes he has been kidnapped, and is desperately searching for him. His family desperately tries to find him.</p>
+          </li>
+          <li class="person" data-reveal="up">
+            <svg class="person__glyph" viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="14" width="22" height="36"/><rect x="36" y="14" width="22" height="36"/><path d="M28 32 h8"/></svg>
+            <h3>The couple</h3>
+            <p>A husband and wife, held hostage inside a house for 40 Lent days, kept in two different rooms.</p>
+          </li>
+          <li class="person" data-reveal="up">
+            <svg class="person__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8 h28 l8 8 v40 h-36z"/><path d="M22 26 h20 M22 34 h20 M22 42 h12"/></svg>
+            <h3>The psychiatrist</h3>
+            <p>The one to whom the protagonist finally reveals everything.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ 9. FRAMES OF ARTIST  (P13–P18) ============ -->
+    <section class="scene scene--frames" id="frames" data-chapter="Frames of Artist" data-progress
+      data-dani-x="50" data-dani-mood="excited" data-dani-pose="point"
+      data-dani-line="Frames straight from the film. Tap any one to look closer.">
+      <div class="frames__sticky">
+        <header class="frames__head wrap">
+          <h2 class="h-section h-grunge" data-reveal="wipe">Frames of Artist</h2>
+          <p class="sub caps">20 frames &middot; 5 reels</p>
+        </header>
+        <div class="strip" id="strip">
+          <div class="strip__track" id="stripTrack">
+            <!-- populated from config (FRAMES) by main.js; static fallback below for no-JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 10. REFERENCE POSTERS  (P19) ============ -->
+    <section class="scene scene--posters" id="posters" data-chapter="Posters"
+      data-dani-x="80" data-dani-mood="happy" data-dani-pose="point"
+      data-dani-line="Some of the reference posters we made. Hover to tilt them.">
+      <div class="wrap">
+        <h2 class="h-section h-grunge" data-reveal="wipe">Some reference posters</h2>
+        <div class="posters">
+          <figure class="poster poster--a" data-reveal="up"><button type="button" class="poster__btn" data-lightbox="assets/img/posters/poster-1.webp" data-caption="Reference poster: a bride and groom behind a veil. The Noche Visual production · A film by Dani · First feature film."><img src="assets/img/posters/poster-1.webp" alt="Poster: ART!ST in red over a bride and groom behind a veil." width="248" height="441" loading="lazy" decoding="async"></button><figcaption>The Noche Visual production &middot; A film by Dani &middot; First feature film</figcaption></figure>
+          <figure class="poster poster--b" data-reveal="up"><button type="button" class="poster__btn" data-lightbox="assets/img/posters/poster-2.webp" data-caption="Reference poster: a man in a suit with curly hair, forest behind. A film by Dani · An independent feature film."><img src="assets/img/posters/poster-2.webp" alt="Landscape poster: a man in a dark suit and open white shirt looks up; ART!ST in red beside him." width="918" height="441" loading="lazy" decoding="async"></button><figcaption>A film by Dani &middot; An independent feature film</figcaption></figure>
+          <figure class="poster poster--c" data-reveal="up"><button type="button" class="poster__btn" data-lightbox="assets/img/posters/poster-3.webp" data-caption="Reference poster: an aerial view of a beach and waves. A film by Dani · Coming soon."><img src="assets/img/posters/poster-3.webp" alt="Poster: aerial view of waves meeting the sand, ART!ST in red." width="461" height="585" loading="lazy" decoding="async"></button><figcaption>A film by Dani &middot; Coming soon</figcaption></figure>
+          <figure class="poster poster--d" data-reveal="up"><button type="button" class="poster__btn" data-lightbox="assets/img/posters/poster-4.webp" data-caption="Reference poster: a dark red silhouette. An independent feature film."><img src="assets/img/posters/poster-4.webp" alt="Poster: a figure in silhouette against deep red light." width="292" height="580" loading="lazy" decoding="async"></button><figcaption>An independent feature film</figcaption></figure>
+          <figure class="poster poster--e" data-reveal="up"><button type="button" class="poster__btn" data-lightbox="assets/img/posters/poster-5.webp" data-caption="Reference poster: a man arching backwards in the dark. An independent feature film."><img src="assets/img/posters/poster-5.webp" alt="Poster: a man arches backwards in darkness under the red title." width="331" height="583" loading="lazy" decoding="async"></button><figcaption>An independent feature film</figcaption></figure>
+          <figure class="poster poster--f" data-reveal="up"><button type="button" class="poster__btn" data-lightbox="assets/img/posters/poster-6.webp" data-caption="Reference poster: a shirtless silhouette against smoke and fire. Artist · Created by Dani · Displaying soon."><img src="assets/img/posters/poster-6.webp" alt="Poster: a shirtless man seen from behind faces billowing smoke and a fiery sky; ART!ST in red across the clouds." width="835" height="1069" loading="lazy" decoding="async"></button><figcaption>Artist &middot; Created by Dani &middot; Displaying soon</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 11. THEMES  (P38 Film statement, P20 Audience attraction) ============ -->
+    <section class="scene scene--themes" id="themes" data-chapter="Themes"
+      data-dani-x="16" data-dani-mood="sad" data-dani-pose="idle"
+      data-dani-line="Mental health. Creativity. Passion. That's the heart of it.">
+      <div class="wrap">
+        <div class="statement">
+          <div class="statement__text">
+            <h2 class="h-section h-grunge" data-reveal="wipe">Film statement</h2>
+            <p class="lead caps" data-reveal="up">The film explores the themes of <em>mental health, creativity, and the pursuit of passion.</em> It is a story that will resonate with anyone who has ever felt the pressure to prove themselves to the world. So we believe that <em>&ldquo;Artist&rdquo;</em> is a unique and powerful film that will leave a lasting impression on the audience.</p>
+          </div>
+          <figure class="statement__img" data-parallax="-0.08"><img src="assets/img/atmos/film-feet.webp" alt="A baby's feet, in deep red light." width="1069" height="1033" loading="lazy" decoding="async"></figure>
+        </div>
+
+        <h2 class="h-section h-grunge" data-reveal="wipe">Audience attraction</h2>
+        <div class="attract">
+          <article class="attract__card" data-reveal="up"><span class="attract__n">01</span><h3>Emotional depth</h3><p>The film explores various relationships, such as the strong bond between brother and sister, husband and wife, and friends. This adds an emotional depth to the story and makes it more relatable to the audience.</p></article>
+          <article class="attract__card" data-reveal="up"><span class="attract__n">02</span><h3>Relevant themes</h3><p>The film touches on various themes, such as the importance of taking care of a pregnant woman and how people around her should treat her. Through the film we will have a symbolic representation of religions, especially Christianity, and the power of determination. These themes are relevant and relatable to the audience, which could draw them in.</p></article>
+          <article class="attract__card" data-reveal="up"><span class="attract__n">03</span><h3>Unique and complex characters</h3><p>The protagonist of the film has a disorder that makes him different from the rest, and the audience can relate to his struggles.</p></article>
+          <article class="attract__card" data-reveal="up"><span class="attract__n">04</span><h3>Suspense and thriller</h3><p>The film is a psychological thriller, which can attract audiences who enjoy suspense and unpredictable storylines.</p></article>
+          <article class="attract__card attract__card--wide" data-reveal="up"><span class="attract__n">05</span><h3>Provoking message</h3><p>The film delivers a message that is relatable and motivating to the audience &mdash; that one should <em class="hl">never give up on their dreams and always give their 100% to achieve them.</em> This message can leave a lasting impression on the audience and make them feel inspired.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 12. INSPIRED BY TRUE EVENTS  (P10) — sealed reveal ============ -->
+    <section class="scene scene--truth" id="truth" data-chapter="Inspired by true events"
+      data-dani-x="70" data-dani-mood="shush" data-dani-pose="shush"
+      data-dani-line="Shh. This one's for juries and programmers. Open it only if you're sure."
+      data-dani-line2="&hellip;Now you know. Please keep the secret.">
+      <div class="wrap wrap--narrow">
+        <h2 class="h-section h-grunge" data-reveal="wipe">Inspired by true events</h2>
+        <p class="lead caps center" data-reveal="up"><em>&ldquo;Most of the audience will be familiar with the true incident, but they won't realize it until the very end.&rdquo;</em></p>
+
+        <div class="seal" id="seal" data-open="false">
+          <div class="seal__envelope" aria-hidden="true">
+            <span class="seal__flap"></span>
+            <span class="seal__wax">!</span>
+          </div>
+          <div class="seal__closed">
+            <p class="seal__warn caps">Contains the film's ending.</p>
+            <p class="seal__note">Intended for festival juries, programmers and industry professionals.</p>
+            <button type="button" class="btn btn--gold" id="sealOpen" aria-expanded="false" aria-controls="sealForm">Break the seal</button>
+            <form class="pass" id="sealForm" autocomplete="off" novalidate hidden>
+              <label class="sr-only" for="sealPass">Password</label>
+              <input class="pass__input" id="sealPass" type="password" placeholder="Enter the password" autocomplete="off" spellcheck="false" required>
+              <button type="submit" class="btn btn--gold">Unlock</button>
+            </form>
+            <p class="pass__msg" id="sealMsg" role="alert" hidden>We got you, enjoy the suspense in theatres</p>
+          </div>
+          <div class="seal__content" id="sealContent" hidden>
+            <h3 class="h-sub">What the true incident is all about</h3>
+            <p class="lead caps">The true inspiration behind Artist is the tragic passing of <em>Heath Andrew Ledger</em>, the legendary Australian actor known for his unforgettable portrayal of <em>the Joker in &ldquo;The Dark Knight&rdquo;</em>. His deep commitment to method acting and the emotional toll it took became the foundation for this story. While Artist is a fictional narrative, it draws from the psychological intensity and haunting reality behind Ledger's experience.</p>
+            <p class="lead caps">This connection is intentionally hidden within the story, only revealed in a powerful twist at the very end. I believe that moment will leave audiences stunned, rethinking everything they've seen and emotionally connecting with the deeper message. It's more than a plot twist &mdash; it's the film's emotional core and major selling point.</p>
+            <button type="button" class="btn btn--ghost" id="sealClose">Seal it again</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 13. COMPARABLES & MARKET PLACE  (P11, P12) ============ -->
+    <section class="scene scene--comps" id="comparables" data-chapter="Comparables"
+      data-dani-x="24" data-dani-mood="happy" data-dani-pose="point"
+      data-dani-line="Films that live in the same dark neighbourhood.">
+      <div class="wrap">
+        <div class="comps">
+          <div class="comps__col">
+            <h2 class="h-section h-grunge" data-reveal="wipe">Comparables</h2>
+            <ol class="titles" data-reveal="stagger">
+              <li>Shutter Island</li>
+              <li>Occupant <small>(Hogar)</small></li>
+              <li>Fractured</li>
+              <li>Intrusion</li>
+              <li>Gone Girl</li>
+              <li>Joker</li>
+            </ol>
+            <button type="button" class="link-btn" data-open-deck="11">View the original slide &rarr;</button>
+          </div>
+          <div class="comps__col">
+            <h2 class="h-section h-grunge" data-reveal="wipe">Market place</h2>
+            <ol class="titles" data-reveal="stagger">
+              <li>Raatchasan</li>
+              <li>Pizza</li>
+              <li>Kaalidas</li>
+              <li>Dhuruvangal Padhinaaru</li>
+              <li>Puriyadha Pudhir</li>
+              <li>Game Over</li>
+            </ol>
+            <button type="button" class="link-btn" data-open-deck="12">View the original slide &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 14. THE DIRECTOR  (P36, P37, P21) ============ -->
+    <section class="scene scene--director" id="director" data-chapter="The director"
+      data-dani-x="82" data-dani-mood="happy" data-dani-pose="wave"
+      data-dani-line="That's me. Well&hellip; a few words from me.">
+      <div class="wrap">
+        <div class="dstate">
+          <figure class="dstate__img" data-parallax="-0.1"><img src="assets/img/atmos/director-profile.webp" alt="A face in profile, rendered in deep red." width="961" height="1357" loading="lazy" decoding="async"></figure>
+          <div class="dstate__text">
+            <h2 class="h-section h-grunge" data-reveal="wipe">Director statement</h2>
+            <p class="lead caps" data-reveal="up">As a writer-director, I approached this story with the intention to challenge both <em>myself and the audience.</em></p>
+            <p class="body" data-reveal="up"><em class="hl">Inspired by true events, Artist tells a story that many may feel familiar with, yet the way the film unfolds keeps its real story origins hidden until the very end and makes the audience surprised.</em> The film is structured <em class="hl">non-linearly</em>, drawing viewers into a puzzle-like narrative that pieces itself together only at the final moment, when the truth is revealed in a jaw-dropping twist that reframes the entire experience.</p>
+            <p class="body" data-reveal="up">With massive visuals and a haunting emotional core, Artist explores themes of obsession, identity, and the weight of societal expectations. My goal is to leave the audience <em class="hl">surprised, moved, and provoked</em> to think deeply about the stories we tell ourselves and the roles we play. This is more than a film &mdash; it's a reflection of our <em class="hl">internal struggles</em>, and the price we pay for chasing greatness.</p>
+            <p class="signature" data-reveal="fade">&mdash; Dani <span>(a) Purushothman, writer &amp; director</span></p>
+          </div>
+        </div>
+
+        <div class="about">
+          <div class="about__text">
+            <h2 class="h-section h-grunge" data-reveal="wipe">About the director</h2>
+            <p class="body" data-reveal="up">As a writer-director with experience in <em class="hl">five short films</em> and pre-production work on a feature film anthology, I am proud to present my first independent feature project. My passion for storytelling led me to create a unique and suspenseful film that is sure to attract audiences. The storyline and screenplay are <em class="hl">entirely original</em>, offering a fresh perspective on the thriller genre. I poured my heart and soul into this project, and I'm excited to see it come to fruition. This project has challenged me to push my creative boundaries and make something truly exceptional.</p>
+          </div>
+          <figure class="about__img" data-reveal="fade"><img class="spin-slow" src="assets/img/atmos/director-tunnel.webp" alt="A figure with arms outstretched at the far end of a dark, concentric tunnel." width="1177" height="1213" loading="lazy" decoding="async"></figure>
+        </div>
+
+        <!-- <div class="marketing">
+          <h2 class="h-section h-grunge" data-reveal="wipe">Director's marketing strategy</h2>
+          <div class="marketing__cols">
+            <p class="body" data-reveal="up">For any film, <em class="hl">marketing and promotion</em> are just as crucial as the film itself. As a director, I believe my responsibility doesn't end in the editing room; it extends to ensuring that the story reaches the widest possible audience. Today's viewers connect with films not only through theaters or OTT platforms but also through social media, short-form content, and immersive digital experiences.</p>
+            <p class="body" data-reveal="up">I have developed a set of <em class="hl">unique and creative promotional ideas</em> including AI-powered campaigns, stylized reels, and thematic visual storytelling &mdash; all aimed at making the film stand out in today's crowded media space. Moreover, the <em class="hl">film itself holds immense potential for organic promotion.</em> Its genre, twist-driven narrative, and thought-provoking themes naturally spark curiosity, discussion, and repeat viewings.</p>
+            <p class="body" data-reveal="up">The psychological depth, the mystery at its core, and the emotional layers are designed to engage audiences deeply, making it highly shareable and buzz-worthy. And the main promotable element is that <em class="hl">the film is inspired by true events</em>, and <em class="hl">&ldquo;most of the audience will be familiar with the true incident, but they won't realize it until the very end&rdquo;</em>. This will create a huge curiosity among the audience.</p>
+          </div>
+          <blockquote class="pull pull--center" data-reveal="up"><p>For me, promotion is not just a marketing task; it's a creative extension of the film's storytelling, designed to pull the audience into its world long before they watch the first frame.</p></blockquote>
+        </div> -->
+      </div>
+    </section>
+
+    <!-- ============ 15. CAST  (P22–P34) ============ -->
+    <!-- <section class="scene scene--cast" id="cast" data-chapter="Cast"
+      data-dani-x="50" data-dani-mood="excited" data-dani-pose="wave"
+      data-dani-line="Meet the faces. Tap a film to see the original slide.">
+      <div class="wrap">
+        <h2 class="h-display h-grunge" data-reveal="wipe">Cast</h2>
+
+        <article class="actor" data-reveal="up">
+          <figure class="actor__img"><img class="cut--sidhu" src="assets/img/cast/cast-sidhu.webp" alt="Sidhu Kumaresan in character: a woman in white, gagged, her wrists bound with rope." width="1141" height="1411" loading="lazy" decoding="async"></figure>
+          <div class="actor__text">
+            <h3 class="actor__name h-grunge">Sidhu Kumaresan</h3>
+            <p class="actor__intro caps">Has acted in many movies like:</p>
+            <ul class="credits">
+              <li><button type="button" data-open-deck="24"><strong>Yaathisai</strong></button> An important supporting character role.</li>
+              <li><button type="button" data-open-deck="25"><strong>Neelira</strong></button> Produced by Karthik Subbaraj &mdash; one of the important main character roles. <span class="tag">Yet to release</span></li>
+              <li><button type="button" data-open-deck="26"><strong>Thangalaan</strong></button> Starring Chiyaan Vikram &mdash; a character role.</li>
+              <li><button type="button" data-open-deck="27"><strong>Master</strong></button> Starring Thalapathy Vijay &mdash; a character role.</li>
+              <li><button type="button" data-open-deck="27"><strong>Maanavan</strong></button> Kadhir in the lead role &mdash; an important supporting character role. <span class="tag">Yet to release</span></li>
+              <li><button type="button" data-open-deck="27"><strong>Shawarma</strong></button> A main lead role. <span class="tag">Yet to release</span></li>
+              <li><button type="button" data-open-deck="28"><strong>P2</strong></button> A main lead role.</li>
+              <li><button type="button" data-open-deck="28"><strong>Untitled</strong></button> Kalidas and Mega Akash in the lead roles &mdash; an important supporting character role. <span class="tag">Yet to release</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="actor actor--flip" data-reveal="up">
+          <figure class="actor__img"><img class="cut--gopinath" src="assets/img/cast/cast-gopinath.webp" alt="Gopinath Shankar in character: a man in a white shirt, gagged, under red light." width="1069" height="1429" loading="lazy" decoding="async"></figure>
+          <div class="actor__text">
+            <h3 class="actor__name h-grunge">Gopinath Shankar</h3>
+            <p class="actor__intro caps">Has acted in many movies like:</p>
+            <ul class="credits">
+              <li><button type="button" data-open-deck="30"><strong>Finder</strong></button> Starring V.T.M. Charle, Sendraayan and Nizhalkal Ravi &mdash; an important antagonist role. Character name: <em class="hl">Guna</em>.</li>
+              <li><button type="button" data-open-deck="31"><strong>Bomb</strong></button> Starring Arjun Das &mdash; an important role. <span class="tag">Yet to release</span></li>
+              <li><button type="button" data-open-deck="32"><strong>Minor</strong></button> Starring Vaaheesan, Janany and V.T.M. Charle &mdash; an important role. <span class="tag">Yet to release</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="actor" data-reveal="up">
+          <figure class="actor__img actor__img--wide"><img class="cut--rambabu" src="assets/img/cast/cast-rambabu.webp" alt="Ram Babu shown in a collage of several characters: a man in a grey shirt, a person in a pink dress, a running man in white, a man in a patterned shirt and a man in a black suit." width="1600" height="1349" loading="lazy" decoding="async"></figure>
+          <div class="actor__text">
+            <h3 class="actor__name h-grunge">Ram Babu</h3>
+            <p class="actor__intro caps">Debutant</p>
+          </div>
+        </article>
+
+        <div class="others">
+          <h3 class="h-sub h-grunge" data-reveal="wipe">Other actors</h3>
+          <div class="others__grid">
+            <figure class="other" data-reveal="up"><img src="assets/img/cast/cast-manigandan.webp" alt="Manigandan, in a black t-shirt and glasses, on a street." width="662" height="760" loading="lazy" decoding="async"><figcaption>Manigandan</figcaption></figure>
+            <figure class="other other--tall" data-reveal="up"><img src="assets/img/cast/cast-sanjeev-kajol.webp" alt="Sanjeev and Kajol as a bride and groom behind a veil." width="914" height="1327" loading="lazy" decoding="async"><figcaption>Sanjeev &amp; Kajol</figcaption></figure>
+            <figure class="other" data-reveal="up"><img src="assets/img/cast/cast-kideon.webp" alt="Kideon Rajkumar with a friend at sunset." width="905" height="623" loading="lazy" decoding="async"><figcaption>Kideon Rajkumar</figcaption></figure>
+          </div>
+          <ul class="others__names" data-reveal="stagger">
+            <li>Jaya Kumar</li><li>Sylvester</li><li>Rajavel</li><li>Krithi</li>
+          </ul>
+        </div>
+      </div>
+    </section> -->
+
+    <!-- ============ 16. CREW  (P35) ============ -->
+    <section class="scene scene--crew" id="crew" data-chapter="Crew"
+      data-dani-x="22" data-dani-mood="happy" data-dani-pose="point"
+      data-dani-line="A team of debutants. Every single one of them.">
+      <div class="wrap wrap--narrow">
+        <h2 class="h-section h-grunge center" data-reveal="wipe">Crew</h2>
+        <p class="crew__sub" data-reveal="up">A team of debutants</p>
+        <dl class="roll">
+          <div data-reveal="up"><dt>Director and writer</dt><dd>Dani (a) Purushothman</dd></div>
+          <div data-reveal="up"><dt>Producer</dt><dd>Dani</dd></div>
+          <div data-reveal="up"><dt>Cinematographer</dt><dd>Marshel, Rajaathaban</dd></div>
+          <div data-reveal="up"><dt>Editor</dt><dd>Mohan</dd></div>
+          <div data-reveal="up"><dt>VFX</dt><dd>Ram Babu</dd></div>
+          <div data-reveal="up"><dt>Music composer</dt><dd>Sam Daniel</dd></div>
+          <div data-reveal="up"><dt>Art director</dt><dd>Kothanaar Karan, Gobi Harish</dd></div>
+          <div data-reveal="up"><dt>Costume designer</dt><dd>Swetha, Janhavi, Pragathy</dd></div>
+          <div data-reveal="up"><dt>Makeup and hair artist</dt><dd>Swetha</dd></div>
+          <div data-reveal="up"><dt>Designers</dt><dd>Dhanwanth, Dani</dd></div>
+          <div data-reveal="up"><dt>Direction department</dt><dd>Kishorekanna, Kalishwaran, Dravid, Subhikshan, Sridhar, Jayakumar, Abhishek, Nithish</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ============ 17. WATCH / MATERIALS ============ -->
+    <section class="scene scene--watch" id="watch" data-chapter="Watch &amp; materials"
+      data-dani-x="78" data-dani-mood="excited" data-dani-pose="point"
+      data-dani-line="The trailer and the original deck live here.">
+      <div class="wrap">
+        <h2 class="h-section h-grunge" data-reveal="wipe">Watch</h2>
+        <div class="watch">
+          <div class="player" id="player">
+            <!-- main.js mounts the trailer from config.js. Fallback state: -->
+            <div class="player__empty">
+              <img src="assets/img/posters/poster-2.webp" alt="" width="918" height="441" loading="lazy" decoding="async">
+              <p class="caps">Trailer &mdash; coming soon</p>
+            </div>
+          </div>
+          <ul class="materials">
+            <li hidden><button type="button" class="btn btn--gold" data-open-deck="1">Browse the original pitch deck</button></li>
+            <li id="deckPdfItem" hidden><a class="btn btn--ghost" id="deckPdfLink" href="#" download>Download the pitch deck (PDF)</a></li>
+            <li id="factSheet"></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 18. THE END  (P39) ============ -->
+    <section class="scene scene--end" id="end" data-chapter="The end" data-progress
+      data-dani-x="50" data-dani-mood="happy" data-dani-pose="wave"
+      data-dani-line="Thanks for walking with me.">
+      <div class="end__bg" aria-hidden="true"><img src="assets/img/atmos/the-end.webp" alt="" width="1600" height="900" loading="lazy" decoding="async"></div>
+      <div class="end__inner">
+        <p class="sr-only">The End.</p>
+        <img class="end__logo" src="assets/img/logo-artist.webp" alt="ARTIST" width="1400" height="264" loading="lazy">
+        <p class="end__line caps">Displaying soon</p>
+        <p class="end__credit">A film by Dani &middot; The Noche Visuals Production</p>
+        <div class="end__contact" id="contact"></div>
+        <a class="link-btn" href="#opening">Back to the opening &uarr;</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ DANI — the guide (see assets/js/dani.js) ============ -->
+  <div class="dani" id="dani" data-mood="happy" data-pose="idle">
+    <div class="dani__bubble" id="daniBubble" aria-hidden="true"><p id="daniText"></p></div>
+    <button type="button" class="dani__btn" id="daniBtn" aria-label="Dani, your guide. Press for a tip.">
+      <svg class="dani__svg" id="daniSvg" viewBox="0 0 100 150" aria-hidden="true" focusable="false">
+        <ellipse class="d-shadow" cx="50" cy="146" rx="20" ry="3.5"/>
+        <g class="d-all">
+          <g class="d-legL"><rect x="40" y="108" width="8.5" height="32" rx="3.5" class="c-pant"/><path d="M36 139.5 h13 a3.2 3.2 0 0 1 0 6.2 h-13 a3.1 3.1 0 0 1 0 -6.2z" class="c-shoe"/></g>
+          <g class="d-legR"><rect x="51.5" y="108" width="8.5" height="32" rx="3.5" class="c-pant"/><path d="M51 139.5 h13 a3.2 3.2 0 0 1 0 6.2 h-13 a3.1 3.1 0 0 1 0 -6.2z" class="c-shoe"/></g>
+          <g class="d-torso">
+            <rect x="33" y="76" width="34" height="40" rx="11" class="c-shirt"/>
+            <rect x="48.4" y="85" width="3.2" height="13" rx="1.2" class="c-gold"/>
+            <circle cx="50" cy="102.5" r="2" class="c-gold"/>
+            <circle cx="40" cy="96" r="1.6" class="c-paint"/><circle cx="60" cy="88" r="1.1" class="c-paint"/><circle cx="57" cy="108" r="1.3" class="c-paint"/>
+          </g>
+          <g class="d-armL"><rect x="29" y="79" width="8.5" height="27" rx="4" class="c-shirt"/><circle cx="33.2" cy="107" r="4.4" class="c-skin"/></g>
+          <g class="d-armR">
+            <rect x="62.5" y="79" width="8.5" height="27" rx="4" class="c-shirt"/>
+            <g class="d-brush"><rect x="65.5" y="100" width="2.6" height="24" rx="1" transform="rotate(-24 66.8 108)" class="c-wood"/><path d="M73.2 121.5 q2.2 4.5 -1 8 q-3 -2.5 -2.2 -7.6z" class="c-paint"/></g>
+            <circle cx="66.8" cy="107" r="4.4" class="c-skin"/>
+          </g>
+          <g class="d-head">
+            <g class="c-hair"><circle cx="30" cy="40" r="10"/><circle cx="70" cy="40" r="10"/><circle cx="34" cy="28" r="11"/><circle cx="66" cy="28" r="11"/><circle cx="50" cy="22" r="14"/><circle cx="27" cy="52" r="7"/><circle cx="73" cy="52" r="7"/></g>
+            <circle cx="26.5" cy="55" r="4.5" class="c-skin"/><circle cx="73.5" cy="55" r="4.5" class="c-skin"/>
+            <ellipse cx="50" cy="52" rx="23" ry="24" class="c-skin"/>
+            <g class="c-hair"><path d="M27 42 q6 -16 23 -15 q17 -1 23 15 q-6 -6 -12 -5 q-3 5 -11 4 q-8 1 -11 -4 q-6 -1 -12 5z"/><circle cx="38" cy="33" r="5"/><circle cx="50" cy="31" r="5.5"/><circle cx="62" cy="33" r="5"/></g>
+            <g class="d-brows"><path class="d-brow d-browL" d="M35 41 q6 -3.5 11 0"/><path class="d-brow d-browR" d="M54 41 q5 -3.5 11 0"/></g>
+            <g class="d-eyes">
+              <ellipse cx="41" cy="51" rx="6.2" ry="7" class="c-eye"/><ellipse cx="59" cy="51" rx="6.2" ry="7" class="c-eye"/>
+              <g class="d-pupils"><circle cx="41" cy="51.5" r="3.4" class="c-pupil"/><circle cx="59" cy="51.5" r="3.4" class="c-pupil"/><circle cx="42.3" cy="50" r="1.1" class="c-eye"/><circle cx="60.3" cy="50" r="1.1" class="c-eye"/></g>
+              <g class="d-lids"><rect x="34" y="43" width="14" height="16" class="c-skin d-lid"/><rect x="52" y="43" width="14" height="16" class="c-skin d-lid"/></g>
+            </g>
+            <ellipse cx="34" cy="61" rx="3.6" ry="2" class="c-blush"/><ellipse cx="66" cy="61" rx="3.6" ry="2" class="c-blush"/>
+            <g class="d-mouths">
+              <path class="d-m d-m--happy" d="M42 63 q8 7 16 0"/>
+              <path class="d-m d-m--excited" d="M41 62 q9 1 18 0 q-1 10 -9 10 q-8 0 -9 -10z"/>
+              <ellipse class="d-m d-m--scared" cx="50" cy="66" rx="3.4" ry="4.2"/>
+              <path class="d-m d-m--thinking" d="M44 66 q5 -2 11 1"/>
+              <path class="d-m d-m--sad" d="M43 68 q7 -6 14 0"/>
+              <path class="d-m d-m--shush" d="M45 65.5 h10"/>
+            </g>
+          </g>
+          <g class="d-finger"><rect x="48.6" y="57" width="3" height="11" rx="1.5" class="c-skin"/></g>
+        </g>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ============ Dialogs: lightbox & original deck viewer ============ -->
+  <dialog class="lightbox" id="lightbox" aria-label="Image viewer">
+    <figure class="lightbox__fig"><img id="lightboxImg" alt=""><figcaption id="lightboxCap"></figcaption></figure>
+    <button type="button" class="lb-nav lb-nav--prev" id="lbPrev" aria-label="Previous image">&larr;</button>
+    <button type="button" class="lb-nav lb-nav--next" id="lbNext" aria-label="Next image">&rarr;</button>
+    <button type="button" class="dialog-close" data-close aria-label="Close image viewer">&times;</button>
+  </dialog>
+
+  <dialog class="deckview" id="deckview" aria-labelledby="deckTitle">
+    <div class="deckview__inner">
+      <header class="deckview__head">
+        <h2 id="deckTitle" class="h-grunge">The original pitch deck</h2>
+        <p class="deckview__count" id="deckCount" aria-live="polite"></p>
+      </header>
+      <div class="deckview__stage">
+        <img id="deckImg" alt="" width="1600" height="900">
+        <div class="deckview__gate" id="deckGate" hidden>
+          <p class="caps">This slide reveals the film's ending.</p>
+          <form class="pass" id="deckGateForm" autocomplete="off" novalidate>
+            <label class="sr-only" for="deckGatePass">Password</label>
+            <input class="pass__input" id="deckGatePass" type="password" placeholder="Enter the password" autocomplete="off" spellcheck="false" required>
+            <button type="submit" class="btn btn--gold" id="deckGateOpen">Reveal slide</button>
+          </form>
+          <p class="pass__msg" id="deckGateMsg" role="alert" hidden>We got you, enjoy the suspense in theatres</p>
+        </div>
+        <button type="button" class="lb-nav lb-nav--prev" id="deckPrev" aria-label="Previous slide">&larr;</button>
+        <button type="button" class="lb-nav lb-nav--next" id="deckNext" aria-label="Next slide">&rarr;</button>
+      </div>
+      <ol class="deckview__thumbs" id="deckThumbs" aria-label="All slides"></ol>
+      <button type="button" class="dialog-close" data-close aria-label="Close the deck viewer">&times;</button>
+    </div>
+  </dialog>
+
+  <noscript><style>.theatre,.dani,.tally,.split__handle,.split__range{display:none!important}[data-reveal]{opacity:1!important;transform:none!important}</style></noscript>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>logo</title></head>
+<body><pre id="log"></pre>
+<script type="module">
+import * as pdfjs from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs';
+pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs';
+const log = (m) => (document.getElementById('log').textContent += m + '\n');
+const doc = await pdfjs.getDocument('/tools/deck-extract/deck.pdf').promise;
+const page = await doc.getPage(1);
+const vp1 = page.getViewport({ scale: 1 });
+const vp = page.getViewport({ scale: 3200 / vp1.width });
+const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+const ctx = c.getContext('2d', { willReadFrequently: true });
+await page.render({ canvasContext: ctx, viewport: vp }).promise;
+const k = vp.width / 1600;
+async function keyed(name, [x0, y0, x1, y1]) {
+  const sx = x0 * k, sy = y0 * k, sw = (x1 - x0) * k, sh = (y1 - y0) * k;
+  const img = ctx.getImageData(sx, sy, sw, sh);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i + 1], b = d[i + 2];
+    // "yellowness": strong red+green, weak blue. Dark-red texture has low green.
+    const y = Math.min(r, g) - b * 0.6;
+    const a = Math.max(0, Math.min(1, (y - 40) / 90));
+    d[i + 3] = Math.round(a * 255);
+  }
+  const o = document.createElement('canvas'); o.width = sw; o.height = sh;
+  o.getContext('2d').putImageData(img, 0, 0);
+  const blob = await new Promise((r) => o.toBlob(r, 'image/png'));
+  await fetch('/save?name=' + name, { method: 'POST', body: blob });
+  log(name + ' ' + Math.round(sw) + 'x' + Math.round(sh) + ' ' + blob.size);
+}
+await keyed('logo-artist.png', [262, 250, 1340, 470]);
+log('DONE');
+</script></body></html>

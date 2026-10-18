@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>extract</title></head>
+<body>
+<pre id="log"></pre>
+<script type="module">
+import * as pdfjs from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs';
+pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs';
+const log = (m) => (document.getElementById('log').textContent += m + '\n');
+const save = (name, body) => fetch('/save?name=' + name, { method: 'POST', body });
+const doc = await pdfjs.getDocument('/tools/deck-extract/deck.pdf').promise;
+log('pages ' + doc.numPages);
+const info = { numPages: doc.numPages, meta: (await doc.getMetadata()).info, pages: [] };
+for (let i = 1; i <= doc.numPages; i++) {
+  const page = await doc.getPage(i);
+  const vp1 = page.getViewport({ scale: 1 });
+  const tc = await page.getTextContent();
+  const fonts = new Set();
+  const items = tc.items.map((t) => { fonts.add(t.fontName); return { s: t.str, f: t.fontName, h: Math.round(t.transform[3]), x: Math.round(t.transform[4]), y: Math.round(t.transform[5]) }; });
+  const fontNames = {};
+  for (const f of fonts) { try { const o = page.commonObjs.get(f); fontNames[f] = o?.name; } catch { } }
+  info.pages.push({ i, w: vp1.width, h: vp1.height, items, fontNames });
+  const scale = 1600 / vp1.width;
+  const vp = page.getViewport({ scale });
+  const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+  await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+  const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.9));
+  await save('p' + String(i).padStart(2, '0') + '.jpg', blob);
+  log('page ' + i);
+}
+await save('text.json', JSON.stringify(info, null, 1));
+log('DONE');
+</script>
+</body></html>

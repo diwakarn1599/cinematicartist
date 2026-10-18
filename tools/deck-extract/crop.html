@@ -1,0 +1,70 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>crop</title></head>
+<body>
+<pre id="log"></pre>
+<script type="module">
+import * as pdfjs from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs';
+pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs';
+const log = (m) => (document.getElementById('log').textContent += m + '\n');
+const save = (name, body) => fetch('/save?name=' + name, { method: 'POST', body });
+// Coordinates are in a 1600x900 page space.
+const CROPS = {
+  1: { 'logo': [262, 250, 1340, 480], 'title-full': [0, 0, 1600, 900] },
+  4: { 'horse': [1000, 120, 1480, 800] },
+  5: { 'chair': [560, 470, 1120, 760] },
+  6: { 'boat': [250, 540, 800, 760] },
+  14: { 'still-red-1': [202, 117, 777, 425], 'still-red-2': [824, 117, 1397, 425], 'still-red-3': [202, 480, 777, 787], 'still-red-4': [824, 480, 1397, 787] },
+  15: { 'still-white-1': [203, 114, 776, 420], 'still-white-2': [824, 114, 1397, 423], 'still-white-3': [203, 479, 776, 787], 'still-white-4': [824, 478, 1397, 787] },
+  16: { 'still-nature-1': [202, 112, 777, 420], 'still-nature-2': [824, 116, 1399, 423], 'still-nature-3': [201, 477, 776, 785], 'still-nature-4': [824, 479, 1399, 787] },
+  17: { 'still-search-1': [207, 116, 778, 421], 'still-search-2': [826, 116, 1398, 421], 'still-search-3': [207, 480, 778, 785], 'still-search-4': [826, 481, 1398, 785] },
+  18: { 'still-dark-1': [207, 116, 778, 421], 'still-dark-2': [826, 116, 1392, 419], 'still-dark-3': [213, 469, 778, 771], 'still-dark-4': [826, 468, 1389, 771] },
+  19: { 'poster-1': [218, 183, 362, 434], 'poster-2': [379, 183, 895, 434], 'poster-3': [214, 451, 476, 782], 'poster-4': [502, 452, 670, 780], 'poster-5': [705, 452, 895, 782], 'poster-6': [915, 183, 1385, 783] },
+  23: { 'cast-sidhu': [960, 110, 1600, 900] },
+  29: { 'cast-gopinath': [1000, 100, 1600, 900] },
+  33: { 'cast-rambabu': [700, 140, 1600, 900] },
+  34: { 'cast-manigandan': [106, 393, 480, 821], 'cast-sanjeev-kajol': [496, 78, 1010, 821], 'cast-kideon': [1028, 80, 1537, 432] },
+  36: { 'director-profile': [0, 60, 540, 820] },
+  37: { 'director-tunnel': [860, 120, 1520, 800] },
+  38: { 'film-feet': [880, 140, 1480, 720] },
+  39: { 'the-end': [0, 0, 1600, 900] },
+};
+const INSET = 3;
+const doc = await pdfjs.getDocument('/tools/deck-extract/deck.pdf').promise;
+for (let i = 1; i <= doc.numPages; i++) {
+  const page = await doc.getPage(i);
+  const vp1 = page.getViewport({ scale: 1 });
+  const scale = 2880 / vp1.width;
+  const vp = page.getViewport({ scale });
+  const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+  const ctx = c.getContext('2d');
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  const k = vp.width / 1600;
+  // full slide for the archive viewer (1600 wide)
+  {
+    const o = document.createElement('canvas'); o.width = 1600; o.height = 900;
+    o.getContext('2d').drawImage(c, 0, 0, 1600, 900);
+    await save('slide-' + String(i).padStart(2, '0') + '.webp', await new Promise((r) => o.toBlob(r, 'image/webp', 0.8)));
+  }
+  for (const [name, box] of Object.entries(CROPS[i] || {})) {
+    const full = name.endsWith('full') || name === 'the-end';
+    const ins = full ? 0 : INSET;
+    const [x0, y0, x1, y1] = box.map((v) => v * k);
+    const sx = x0 + ins * k, sy = y0 + ins * k, sw = x1 - x0 - 2 * ins * k, sh = y1 - y0 - 2 * ins * k;
+    const maxW = 1600;
+    const s = Math.min(1, maxW / sw);
+    const o = document.createElement('canvas'); o.width = Math.round(sw * s); o.height = Math.round(sh * s);
+    o.getContext('2d').drawImage(c, sx, sy, sw, sh, 0, 0, o.width, o.height);
+    await save(name + '.webp', await new Promise((r) => o.toBlob(r, 'image/webp', 0.84)));
+  }
+  // palette samples
+  if (i === 1 || i === 3 || i === 22) {
+    const pts = { edgeRed: [40, 450], edgeRed2: [1560, 120], center: [800, 150], yellow: i === 22 ? [560, 300] : [700, 340] };
+    const out = {};
+    for (const [n, [x, y]] of Object.entries(pts)) { const d = ctx.getImageData(x * k, y * k, 1, 1).data; out[n] = '#' + [d[0], d[1], d[2]].map((v) => v.toString(16).padStart(2, '0')).join(''); }
+    log('p' + i + ' ' + JSON.stringify(out));
+  }
+  log('page ' + i);
+}
+log('DONE');
+</script>
+</body></html>
